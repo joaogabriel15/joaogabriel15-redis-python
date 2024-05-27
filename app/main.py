@@ -16,7 +16,7 @@ def handle_connection(conn, addr):
             print(response)
             conn.send(response.encode())
         if "echo" in command.lower():
-            response = data[1]
+            response = f'${len(data[1].rstrip())}\r\n{data[1]}\r\n'
             print(response)
             conn.send(response.encode())
 
