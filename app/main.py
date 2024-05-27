@@ -8,11 +8,20 @@ def handle_connection(conn, addr):
         request: bytes = conn.recv(1024)
         if not request:
             break
-        data: str = request.decode()
-        if "ping" in data.lower():
+        data = request.decode().split(' ')
+        command = data[0]
+
+        if "ping" in command.lower():
             response = "+PONG\r\n"
             print(response)
             conn.send(response.encode())
+        if "echo" in command.lower():
+            if data[1] == None:
+                conn.send("")
+            response = data[1]
+            print(response)
+            conn.send(response.encode())
+
     conn.close()
 
 
@@ -30,7 +39,7 @@ def main():
     while True:
         client_socket, client_address = server_socket.accept()
         threading.Thread(target=handle_connection, args=[client_socket, client_address]).start()
-    
+
 
    
             
