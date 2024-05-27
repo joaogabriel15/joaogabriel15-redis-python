@@ -1,5 +1,20 @@
 # Uncomment this to pass the first stage
 import socket
+import threading
+
+
+def handle_connection(conn, addr):
+    while True:
+        request: bytes = conn.recv(1024)
+        if not request:
+            break
+        data: str = request.decode()
+        if "ping" in data.lower():
+            response = "+PONG\r\n"
+            print(response)
+            conn.send(response.encode())
+    conn.close()
+
 
 
 def main():
@@ -11,14 +26,12 @@ def main():
     # server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
     # server_socket.accept() # wait for client
     server_socket = socket.create_server(('localhost',6379), reuse_port=True)
-    client, addr = server_socket.accept()
+    
+    while True:
+        client_socket, client_address = server_socket.accept()
+        threading.Thread(target=handle_connection, args=[client_socket, client_address]).start()
+    
 
-    with client:
-        while True:
-            data = client.recv(1024)
-            if not data:
-                break
-            client.send(b"+PONG\r\n")
    
             
 
