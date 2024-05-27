@@ -16,8 +16,6 @@ def handle_connection(conn, addr):
             print(response)
             conn.send(response.encode())
         if "echo" in command.lower():
-            if data[1] == None:
-                conn.send("")
             response = data[1]
             print(response)
             conn.send(response.encode())
