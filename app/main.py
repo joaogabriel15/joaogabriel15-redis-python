@@ -6,7 +6,7 @@ import threading
 def response_template(data, fist_byte='+'):
     info = ""
     
-    if data.rstrip().split()[1]:
+    if len(data.rstrip().split()) > 1:
         info = data.rstrip().split()[1]
 
     match fist_byte:
@@ -19,7 +19,7 @@ def response_template(data, fist_byte='+'):
         case ':':
             print(fist_byte)
         case '$':
-            print(fist_byte)
+            print(f'{fist_byte}{len(info)}\r\n{info}\r\n')
             return f'{fist_byte}{len(info)}\r\n{info}\r\n'
         case '*':
             print(fist_byte)
