@@ -4,7 +4,10 @@ import threading
 
 
 def response_template(data, fist_byte='+'):
-    info = data.rstrip().split()[1]
+    info = ""
+    
+    if data.rstrip().split()[1]:
+        info = data.rstrip().split()[1]
 
     match fist_byte:
         case '+' :
@@ -48,6 +51,8 @@ def handle_connection(conn, addr):
         data = request.decode()
         split_data = data.split("\r\n")
         
+        print(data.split("\r\n"))
+
         command = split_data[0]
 
         if "ping" in command.lower():
