@@ -1,46 +1,72 @@
+# Uncomment this to pass the first stage
 import socket
 import threading
 
-def handle_client(client_socket, client_address):
-    print(f"Client: {client_address}")
-    try:
-        while True:
-            request = client_socket.recv(1024)
-            if not request:
-                break  # if no more data, then the connection will break
-            
-            data = request.decode()
-            
-            if data.startswith("*1") and "PING" in data:
-                response = "+PONG\r\n"
-                client_socket.send(response.encode())
-            elif data.startswith("*2") and "ECHO" in data:
-                parts = data.split("\r\n")
-                message = parts[4]
-                response = f"${len(message)}\r\n{message}\r\n"
-                client_socket.send(response.encode())
-            else:
-                # Handle unexpected input or commands
-                response = "-ERROR\r\n"
-                client_socket.send(response.encode())
+
+def redis_encode(data, encoding="utf-8"):
+    if not isinstance(data, list):
+        data = [data]
+
+    separador = "\r\n"
+    size = len(data)
+    encoded = []
+
+    for item in data:
+        encoded.append(f"${len(item)}")
+        encoded.append(item)
+
+    print(encoded)
+    if size > 1:
+        encoded.insert(0, f"*{size}")
     
-    except Exception as ex:
-        print(f"Error handling the client {client_address}: {ex}")
-    finally:
-        client_socket.close()
-        print(f"Client {client_address} is disconnected")
+    print(encoded)
+
+    return (separador.join(encoded) + separador).encode(encoding=encoding)
+
+def handle_connection(conn, addr):
+    while True:
+        data = conn.recv(1024)
+
+        if not data:
+            break
+
+        arr_size, *arr = data.split(b"\r\n")
+        print(f"Arr size: {arr_size}")
+        print(f"Arr content: {arr}")
+        
+        if arr[1].lower() == b"ping":
+            response = redis_encode("PONG")
+
+            conn.sendall(response)
+        elif arr[1].lower() == b"echo":
+            response = redis_encode([el.decode("utf-8") for el in arr[3::2]])
+            print(response)
+            conn.sendall(response)
+        else:
+            break
+
+    conn.close()
+
 
 def main():
-    print("Logs from your program will appear here!")
-    server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
+    server = socket.create_server(('localhost', 6379), reuse_port=True)
+    clients = {}
 
     while True:
-        client_socket, address = server_socket.accept()  # Accept client connection
-        print(f"Accepted connection from {address[0]}:{address[1]}")
-        # Create a new thread to handle the client
-        client_thread = threading.Thread(target=handle_client, args=(client_socket, address))
-        # Start a thread for each new client
-        client_thread.start()
+        conn, client_addr = server.accept()
+
+        try:
+            threading.Thread(target=handle_connection, args=[conn, client_addr]).start()
+
+
+        except Exception as e:
+            print(e)
+            conn.close()
+
+   
+            
+
+    
 
 if __name__ == "__main__":
     main()
