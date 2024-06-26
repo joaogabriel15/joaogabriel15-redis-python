@@ -3,22 +3,60 @@ import socket
 import threading
 
 
+def response_template(data, fist_byte='+'):
+    info = data.rstrip().split()[1]
+
+    match fist_byte:
+        case '+' :
+            print(f'{fist_byte}{info}\r\n')
+            return f'{fist_byte}{info}\r\n'
+        case '-':
+            print(fist_byte)
+            return f'{fist_byte}{info}\r\n'
+        case ':':
+            print(fist_byte)
+        case '$':
+            print(fist_byte)
+            return f'{fist_byte}{len(info)}\r\n{info}\r\n'
+        case '*':
+            print(fist_byte)
+        case '_':
+            print(fist_byte)
+        case '#':
+            print(fist_byte)
+        case '(':
+            print(fist_byte)
+        case '!':
+            print(fist_byte)
+        case '=':
+            print(fist_byte)
+        case '%':
+            print(fist_byte)
+        case '~':
+            print(fist_byte)
+        case '>':
+            print(fist_byte)
+    
+
+
 def handle_connection(conn, addr):
     while True:
         request: bytes = conn.recv(1024)
         if not request:
             break
-        data = request.decode().split(' ')
-        command = data[0]
+
+        data = request.decode()
+        split_data = data.split("\r\n")
+        
+        command = split_data[0]
 
         if "ping" in command.lower():
             response = "+PONG\r\n"
-            print(response)
             conn.send(response.encode())
         if "echo" in command.lower():
-            response = f'${len(data[1].rstrip())}\r\n{data[1]}\r\n'
-            print(response)
+            response = response_template(data, '$')
             conn.send(response.encode())
+
 
     conn.close()
 
