@@ -86,7 +86,7 @@ def handle_connection(conn, addr, role):
 
         else:
             break
-
+    conn.close()
    
 
 def main():
