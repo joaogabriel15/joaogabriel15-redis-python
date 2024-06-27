@@ -79,7 +79,7 @@ def handle_connection(conn, addr, role):
 
         elif arr[1].lower() == b"info":
             response = redis_encode(f"role:master")
-            if len(role) > 0:
+            if role is None:
                 response = redis_encode(f"role:slave")
             
             conn.sendall(response)
