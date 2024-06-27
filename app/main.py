@@ -1,6 +1,8 @@
 # Uncomment this to pass the first stage
 import socket
 import threading
+from argparse import ArgumentParser
+
 
 db = {}
 
@@ -77,7 +79,10 @@ def handle_connection(conn, addr):
    
 
 def main():
-    server = socket.create_server(('localhost', 6379), reuse_port=True)
+    parser = ArgumentParser("Redis Python")
+    parser.add_argument("--port", type=int, default=6379)
+
+    server = socket.create_server(('localhost', parser.parse_args().port), reuse_port=True)
 
     while True:
         conn, client_addr = server.accept()
