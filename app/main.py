@@ -66,6 +66,7 @@ def handle_connection(conn, addr):
             
             response = redis_encode("OK")
             conn.sendall(response)
+
         elif arr[1].lower() == b"get":
             response = "$-1\r\n".encode("utf-8")
 
@@ -73,6 +74,11 @@ def handle_connection(conn, addr):
                 response = redis_encode(db[arr[3].decode("utf-8")])
            
             conn.sendall(response)
+
+        elif arr[1].lower() == b"info":
+            response = redis_encode("role:master")
+            conn.sendall(response)
+
         else:
             break
 
