@@ -63,7 +63,7 @@ def handle_connection(conn, addr):
             response = redis_encode("OK")
             conn.sendall(response)
         elif arr[1].lower() == b"get":
-            response = "\r\n$-1\r\n".encode("utf-8")
+            response = "$-1\r\n".encode("utf-8")
 
             if arr[3].decode("utf-8") in db.keys():
                 response = redis_encode(db[arr[3].decode("utf-8")])
