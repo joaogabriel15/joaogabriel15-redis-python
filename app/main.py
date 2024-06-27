@@ -2,6 +2,8 @@
 import socket
 import threading
 
+db = {}
+
 
 def redis_encode(data, encoding="utf-8"):
     
@@ -44,20 +46,20 @@ def handle_connection(conn, addr):
             conn.sendall(response)
 
         elif arr[1].lower() == b"set":
+            db[arr[3].decode("utf-8")] = arr[5].decode("utf-8")
             response = redis_encode("OK")
             conn.sendall(response)
         elif arr[1].lower() == b"get": 
-            response = redis_encode("bar")
+            print()
+            response = redis_encode(db[arr[3].decode("utf-8")])
             conn.sendall(response)
         else:
             break
 
-    conn.close()
-
+   
 
 def main():
     server = socket.create_server(('localhost', 6379), reuse_port=True)
-    clients = {}
 
     while True:
         conn, client_addr = server.accept()
