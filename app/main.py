@@ -23,10 +23,19 @@ def redis_encode(data, encoding="utf-8"):
     
     return (separador.join(encoded) + separador).encode(encoding=encoding)
 
+def redis_set(data, time=None):
+    key = data[3].decode("utf-8")
+    inf = data[5].decode("utf-8")
 
+    db[key] = inf
 
+    if time is None:
+        return
+    print("tempo")
+    threading.Timer(time.decode("utf-8") / 1000, redis_remove,(key)).start()
 
-
+def redis_remove(key):
+    del data[key]
 
 def handle_connection(conn, addr):
     while True:
@@ -46,12 +55,19 @@ def handle_connection(conn, addr):
             conn.sendall(response)
 
         elif arr[1].lower() == b"set":
-            db[arr[3].decode("utf-8")] = arr[5].decode("utf-8")
+            if arr[7].lower() == px:
+                redis_set(arr, arr[7])
+            else:
+                redis_set(arr)
+            
             response = redis_encode("OK")
             conn.sendall(response)
-        elif arr[1].lower() == b"get": 
-            print()
-            response = redis_encode(db[arr[3].decode("utf-8")])
+        elif arr[1].lower() == b"get":
+            response = "\r\n$-1\r\n".encode("utf-8")
+
+            if db[arr[3].decode("utf-8")]:
+                response = redis_encode(db[arr[3].decode("utf-8")])
+           
             conn.sendall(response)
         else:
             break
