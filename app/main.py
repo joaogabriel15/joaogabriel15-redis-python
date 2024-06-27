@@ -55,8 +55,9 @@ def handle_connection(conn, addr):
             conn.sendall(response)
 
         elif arr[1].lower() == b"set":
-            if arr[7].lower() == b"px":
-                redis_set(arr, arr[9])
+            if len(arr) > 5:
+                if arr[7].lower() == b"px":
+                    redis_set(arr, arr[9])
             else:
                 redis_set(arr)
             
