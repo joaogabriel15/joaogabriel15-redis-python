@@ -40,6 +40,8 @@ def redis_remove(key):
     del db[key]
 
 def handle_connection(conn, addr, role):
+    print(role[0])
+
     while True:
         data = conn.recv(1024)
 
@@ -76,8 +78,7 @@ def handle_connection(conn, addr, role):
             conn.sendall(response)
 
         elif arr[1].lower() == b"info":
-            print(role)
-            response = redis_encode(f"role:{role}")
+            response = redis_encode(f"role:{role[0]}")
             conn.sendall(response)
 
         else:
@@ -88,7 +89,7 @@ def handle_connection(conn, addr, role):
 def main():
     parser = ArgumentParser("Redis Python")
     parser.add_argument("--port", type=int, default=6379)
-    parser.add_argument("--replicaof",  default="master", nargs="+")
+    parser.add_argument("--replicaof", type=str, default="master", nargs=1)
 
     server = socket.create_server(('localhost', parser.parse_args().port), reuse_port=True)
 
