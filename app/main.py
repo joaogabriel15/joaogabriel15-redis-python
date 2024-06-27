@@ -4,9 +4,10 @@ import threading
 
 
 def redis_encode(data, encoding="utf-8"):
+    
     if not isinstance(data, list):
         data = [data]
-
+   
     separador = "\r\n"
     size = len(data)
     encoded = []
@@ -15,13 +16,15 @@ def redis_encode(data, encoding="utf-8"):
         encoded.append(f"${len(item)}")
         encoded.append(item)
 
-    print(encoded)
     if size > 1:
         encoded.insert(0, f"*{size}")
     
-    print(encoded)
-
     return (separador.join(encoded) + separador).encode(encoding=encoding)
+
+
+
+
+
 
 def handle_connection(conn, addr):
     while True:
@@ -31,16 +34,20 @@ def handle_connection(conn, addr):
             break
 
         arr_size, *arr = data.split(b"\r\n")
-        print(f"Arr size: {arr_size}")
-        print(f"Arr content: {arr}")
         
         if arr[1].lower() == b"ping":
             response = redis_encode("PONG")
-
             conn.sendall(response)
+
         elif arr[1].lower() == b"echo":
             response = redis_encode([el.decode("utf-8") for el in arr[3::2]])
-            print(response)
+            conn.sendall(response)
+
+        elif arr[1].lower() == b"set":
+            response = redis_encode("OK")
+            conn.sendall(response)
+        elif arr[1].lower() == b"get": 
+            response = redis_encode("bar")
             conn.sendall(response)
         else:
             break
