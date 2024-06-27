@@ -88,7 +88,7 @@ def handle_connection(conn, addr, role):
 def main():
     parser = ArgumentParser("Redis Python")
     parser.add_argument("--port", type=int, default=6379)
-    parser.add_argument("--replicaof",  default="master")
+    parser.add_argument("--replicaof",  default="master", nargs="+")
 
     server = socket.create_server(('localhost', parser.parse_args().port), reuse_port=True)
 
