@@ -39,7 +39,7 @@ def redis_set(data, time=None):
 def redis_remove(key):
     del db[key]
 
-def handle_connection(conn, addr):
+def handle_connection(conn, addr, role):
     while True:
         data = conn.recv(1024)
 
@@ -76,7 +76,7 @@ def handle_connection(conn, addr):
             conn.sendall(response)
 
         elif arr[1].lower() == b"info":
-            response = redis_encode("role:master")
+            response = redis_encode(f"role:{role}")
             conn.sendall(response)
 
         else:
@@ -87,14 +87,18 @@ def handle_connection(conn, addr):
 def main():
     parser = ArgumentParser("Redis Python")
     parser.add_argument("--port", type=int, default=6379)
+    parser.add_argument("--replicaof", type=ascii, default="master", args="+")
 
     server = socket.create_server(('localhost', parser.parse_args().port), reuse_port=True)
+
+
+    role = parser.parse_args().replicaof
 
     while True:
         conn, client_addr = server.accept()
 
         try:
-            threading.Thread(target=handle_connection, args=[conn, client_addr]).start()
+            threading.Thread(target=handle_connection, args=[conn, client_addr, role]).start()
 
 
         except Exception as e:
