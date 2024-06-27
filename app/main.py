@@ -32,7 +32,7 @@ def redis_set(data, time=None):
     if time is None:
         return
     print("tempo")
-    threading.Timer(float(time.decode("utf-8")) / 1000, redis_remove,(key)).start()
+    threading.Timer(float(time.decode("utf-8")) / 1000, redis_remove,(key,)).start()
 
 def redis_remove(key):
     del db[key]
