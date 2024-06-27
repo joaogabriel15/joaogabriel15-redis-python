@@ -55,8 +55,8 @@ def handle_connection(conn, addr):
             conn.sendall(response)
 
         elif arr[1].lower() == b"set":
-            if arr[7].lower() == px:
-                redis_set(arr, arr[7])
+            if arr[7].lower() == b"px":
+                redis_set(arr, arr[9])
             else:
                 redis_set(arr)
             
@@ -65,7 +65,7 @@ def handle_connection(conn, addr):
         elif arr[1].lower() == b"get":
             response = "\r\n$-1\r\n".encode("utf-8")
 
-            if db[arr[3].decode("utf-8")]:
+            if arr[3].decode("utf-8") in db.keys():
                 response = redis_encode(db[arr[3].decode("utf-8")])
            
             conn.sendall(response)
