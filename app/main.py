@@ -76,6 +76,7 @@ def handle_connection(conn, addr, role):
             conn.sendall(response)
 
         elif arr[1].lower() == b"info":
+            print(role)
             response = redis_encode(f"role:{role}")
             conn.sendall(response)
 
@@ -87,7 +88,7 @@ def handle_connection(conn, addr, role):
 def main():
     parser = ArgumentParser("Redis Python")
     parser.add_argument("--port", type=int, default=6379)
-    parser.add_argument("--replicaof", type=ascii, default="master", args="+")
+    parser.add_argument("--replicaof",  default="master")
 
     server = socket.create_server(('localhost', parser.parse_args().port), reuse_port=True)
 
