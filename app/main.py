@@ -35,7 +35,7 @@ def redis_set(data, time=None):
     threading.Timer(float(time.decode("utf-8")) / 1000, redis_remove,(key)).start()
 
 def redis_remove(key):
-    del data[key]
+    del db[key]
 
 def handle_connection(conn, addr):
     while True:
