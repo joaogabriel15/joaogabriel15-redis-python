@@ -40,7 +40,7 @@ def redis_remove(key):
     del db[key]
 
 def handle_connection(conn, addr, role):
-    print(role[0])
+    print("lala", role)
 
     while True:
         data = conn.recv(1024)
